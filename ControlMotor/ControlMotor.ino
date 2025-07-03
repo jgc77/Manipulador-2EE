@@ -5,10 +5,15 @@ AccelStepper stepper1(1, 4, 5);  // Junta 1 - Base
 AccelStepper stepper2(1, 6, 7);  // Junta 2 - Ombro
 AccelStepper stepper3(1, 8, 9);  // Junta 3 - Cotovelo
 
-const int pinoSeletor = 2;      // Pino da Seletor
-int estadoAnteriorSeletor = HIGH;  // Estado anterior da Seletor
+const int pinoSeletor = 2;  // Pino da Seletor
+int estadoAnteriorSeletor = HIGH;
 
-// Alvos de posição
+const int enable1 = 10;
+const int enable2 = 11;
+const int enable3 = 12;
+
+bool modoCalibracao = false;
+
 long target1 = 0;
 long target2 = 0;
 long target3 = 0;
@@ -18,36 +23,38 @@ bool newData = false;
 
 void setup() {
   Serial.begin(9600);
-  pinMode(pinoSeletor, INPUT_PULLUP);  // Usa resistor pull-up interno
+  pinMode(pinoSeletor, INPUT_PULLUP);
+
+  // Pinos de enable dos drivers
+  pinMode(enable1, OUTPUT);
+  pinMode(enable2, OUTPUT);
+  pinMode(enable3, OUTPUT);
+
+  // Inicialmente, desativa os drivers (nível alto no enable barrado)
+  digitalWrite(enable1, LOW);
+  digitalWrite(enable2, LOW);
+  digitalWrite(enable3, LOW);
 
   // Configuração dos motores
-  stepper1.setMaxSpeed(400);
-  stepper1.setAcceleration(200);
+  stepper1.setMaxSpeed(100);
+  stepper1.setAcceleration(50);
 
-  stepper2.setMaxSpeed(400);
-  stepper2.setAcceleration(200);
+  stepper2.setMaxSpeed(100);
+  stepper2.setAcceleration(50);
 
-  stepper3.setMaxSpeed(400);
-  stepper3.setAcceleration(200);
+  stepper3.setMaxSpeed(100);
+  stepper3.setAcceleration(50);
 
   Serial.println("Digite os ângulos alvo para base, ombro e cotovelo separados por espaço (ex: 200 -150 100):");
 }
 
 void loop() {
-  // Leitura da Seletor
   int estadoAtualSeletor = digitalRead(pinoSeletor);
-  
-  // Só imprime se houve mudança de estado
   if (estadoAtualSeletor != estadoAnteriorSeletor) {
-    if (estadoAtualSeletor == HIGH) {
-      Serial.println("Seletor 0");
-    } else {
-      Serial.println("Seletor 1");
-    }
+    Serial.println(estadoAtualSeletor == HIGH ? "Seletor 0" : "Seletor 1");
     estadoAnteriorSeletor = estadoAtualSeletor;
   }
 
-  // Leitura Serial
   if (Serial.available()) {
     char inChar = (char)Serial.read();
     if (inChar == '\n') {
@@ -58,12 +65,12 @@ void loop() {
   }
 
   if (newData) {
-    parseInput(inputString);
+    processaComando(inputString);
     inputString = "";
     newData = false;
   }
 
-  // Movimentação
+  // Movimentação normal
   stepper1.moveTo(target1);
   stepper2.moveTo(target2);
   stepper3.moveTo(target3);
@@ -73,10 +80,31 @@ void loop() {
   stepper3.run();
 }
 
-// Interpreta a string recebida e extrai os valores
-void parseInput(String input) {
-  input.trim(); // Remove espaços extras
+void processaComando(String input) {
+  input.trim();
 
+  if (input.equalsIgnoreCase("calib")) {
+    modoCalibracao = true;
+    digitalWrite(enable1, HIGH);
+    digitalWrite(enable2, HIGH);
+    digitalWrite(enable3, HIGH);
+    Serial.println("Modo calibração ativado. Digite 'ok' para desativar.");
+    return;
+  }
+
+  if (modoCalibracao && input.equalsIgnoreCase("ok")) {
+    modoCalibracao = false;
+    digitalWrite(enable1, LOW);
+    digitalWrite(enable2, LOW);
+    digitalWrite(enable3, LOW);
+    Serial.println("Modo calibração desativado.");
+    return;
+  }
+
+  parseInput(input);
+}
+
+void parseInput(String input) {
   int space1 = input.indexOf(' ');
   int space2 = input.indexOf(' ', space1 + 1);
 
