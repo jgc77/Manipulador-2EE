@@ -1,11 +1,11 @@
 #include <AccelStepper.h>
 
 // Definição dos motores
-AccelStepper stepper1(1, 4, 5);  // Junta 1 - Base
-AccelStepper stepper2(1, 6, 7);  // Junta 2 - Ombro
-AccelStepper stepper3(1, 8, 9);  // Junta 3 - Cotovelo
+AccelStepper stepper1(1, 4, 5);  // Base
+AccelStepper stepper2(1, 6, 7);  // Ombro
+AccelStepper stepper3(1, 8, 9);  // Cotovelo
 
-const int pinoSeletor = 2;  // Pino da Seletor
+const int pinoSeletor = 2;
 int estadoAnteriorSeletor = HIGH;
 
 const int enable1 = 10;
@@ -14,6 +14,10 @@ const int enable3 = 12;
 
 bool modoCalibracao = false;
 
+// Fator de conversão grau → passo
+const float passoPorGrau = 2048.0 / 360.0;
+
+// Alvos (em passos)
 long target1 = 0;
 long target2 = 0;
 long target3 = 0;
@@ -25,17 +29,14 @@ void setup() {
   Serial.begin(9600);
   pinMode(pinoSeletor, INPUT_PULLUP);
 
-  // Pinos de enable dos drivers
   pinMode(enable1, OUTPUT);
   pinMode(enable2, OUTPUT);
   pinMode(enable3, OUTPUT);
 
-  // Inicialmente, desativa os drivers (nível alto no enable barrado)
   digitalWrite(enable1, LOW);
   digitalWrite(enable2, LOW);
   digitalWrite(enable3, LOW);
 
-  // Configuração dos motores
   stepper1.setMaxSpeed(100);
   stepper1.setAcceleration(50);
 
@@ -45,7 +46,7 @@ void setup() {
   stepper3.setMaxSpeed(100);
   stepper3.setAcceleration(50);
 
-  Serial.println("Digite os ângulos alvo para base, ombro e cotovelo separados por espaço (ex: 200 -150 100):");
+  Serial.println("Digite os ângulos (graus) para base, ombro e cotovelo (ex: 90 -45 30):");
 }
 
 void loop() {
@@ -70,7 +71,6 @@ void loop() {
     newData = false;
   }
 
-  // Movimentação normal
   stepper1.moveTo(target1);
   stepper2.moveTo(target2);
   stepper3.moveTo(target3);
@@ -109,21 +109,40 @@ void parseInput(String input) {
   int space2 = input.indexOf(' ', space1 + 1);
 
   if (space1 > 0 && space2 > space1) {
-    long val1 = input.substring(0, space1).toInt();
-    long val2 = input.substring(space1 + 1, space2).toInt();
-    long val3 = input.substring(space2 + 1).toInt();
+    float ang1 = input.substring(0, space1).toFloat();
+    float ang2 = input.substring(space1 + 1, space2).toFloat();
+    float ang3 = input.substring(space2 + 1).toFloat();
 
-    target1 = val1;
-    target2 = val2;
-    target3 = val3;
+    target1 = grausParaPassos(limitarBase(ang1));
+    target2 = grausParaPassos(limitarOmbro(ang2));
+    target3 = grausParaPassos(limitarCotovelo(ang3));
 
     Serial.print("Movendo para: Base = ");
-    Serial.print(target1);
-    Serial.print(" | Ombro = ");
-    Serial.print(target2);
-    Serial.print(" | Cotovelo = ");
-    Serial.println(target3);
+    Serial.print(ang1);
+    Serial.print("° | Ombro = ");
+    Serial.print(ang2);
+    Serial.print("° | Cotovelo = ");
+    Serial.print(ang3);
+    Serial.println("°");
   } else {
-    Serial.println("Formato inválido. Use: valor1 valor2 valor3 (ex: 200 -150 100)");
+    Serial.println("Formato inválido. Use: grau1 grau2 grau3 (ex: 90 -45 30)");
   }
+}
+
+// Limites em graus
+float limitarBase(float ang) {
+  return constrain(ang, -180, 180);
+}
+
+float limitarOmbro(float ang) {
+  return constrain(ang, -90, 90);
+}
+
+float limitarCotovelo(float ang) {
+  return constrain(ang, -90, 90);
+}
+
+// Conversão grau → passo
+long grausParaPassos(float grau) {
+  return round(grau * passoPorGrau);
 }
