@@ -1,5 +1,5 @@
-#ifndef MOTOR_H
-#define MOTOR_H
+#ifndef CONTROLMOTOR_H
+#define CONTROLMOTOR_H
 
 #include <AccelStepper.h>
 
@@ -18,8 +18,8 @@ void setAlvosGraus(float base, float ombro, float cotovelo);
 void ativarCalibracao();
 void desativarCalibracao();
 bool emModoCalibracao();
-void verificarSeletor();
-bool obterEstadoSeletor();
 
+void verificarSeletor();
+bool obterEstadoSeletor(); 
 
 #endif

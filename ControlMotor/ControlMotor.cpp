@@ -1,4 +1,4 @@
-#include "motor.h"
+#include "ControlMotor.h"
 
 const float passoPorGrau = 2048.0 / 360.0;
 
@@ -11,15 +11,16 @@ const int enable2 = 11;
 const int enable3 = 12;
 
 const int pinoSeletor = 2;
+int estadoSeletor = HIGH;
 int estadoAnteriorSeletor = HIGH;
+unsigned long ultimaMudanca = 0;
+const unsigned long tempoDebounce = 30; // ms
 
 long target1 = 0;
 long target2 = 0;
 long target3 = 0;
 
 bool modoCalibracao = false;
-bool estadoSeletor = true;
-
 
 void inicializarMotores() {
   pinMode(enable1, OUTPUT);
@@ -42,6 +43,23 @@ void inicializarMotores() {
   pinMode(pinoSeletor, INPUT_PULLUP);
 }
 
+// Funções auxiliares
+float limitarBase(float ang) {
+  return constrain(ang, -180, 180);
+}
+
+float limitarOmbro(float ang) {
+  return constrain(ang, -90, 90);
+}
+
+float limitarCotovelo(float ang) {
+  return constrain(ang, -90, 90);
+}
+
+long grausParaPassos(float grau) {
+  return round(grau * passoPorGrau);
+}
+
 void atualizarMotores() {
   stepper1.moveTo(target1);
   stepper2.moveTo(target2);
@@ -53,18 +71,26 @@ void atualizarMotores() {
 }
 
 void verificarSeletor() {
-  int estadoAtual = digitalRead(pinoSeletor);
-  if (estadoAtual != estadoAnteriorSeletor) {
-    Serial.println(estadoAtual == HIGH ? "Seletor 0" : "Seletor 1");
-    estadoAnteriorSeletor = estadoAtual;
+  int SeletorAtual = digitalRead(pinoSeletor);
+
+  if (SeletorAtual != estadoAnteriorSeletor) {
+    ultimaMudanca = millis(); // resetar timer
   }
-  estadoSeletor = (estadoAtual == HIGH);  // salva o estado atual
+
+  if ((millis() - ultimaMudanca) > tempoDebounce) {
+    if (SeletorAtual != estadoSeletor) {
+      estadoSeletor = SeletorAtual;
+      Serial.println(estadoSeletor == HIGH ? "Seletor 0" : "Seletor 1");
+    }
+  }
+
+  estadoAnteriorSeletor = SeletorAtual;
 }
+
 
 bool obterEstadoSeletor() {
   return estadoSeletor;
 }
-
 
 void setAlvosGraus(float base, float ombro, float cotovelo) {
   target1 = grausParaPassos(limitarBase(base));
@@ -90,19 +116,3 @@ bool emModoCalibracao() {
   return modoCalibracao;
 }
 
-// Funções auxiliares
-float limitarBase(float ang) {
-  return constrain(ang, -180, 180);
-}
-
-float limitarOmbro(float ang) {
-  return constrain(ang, -90, 90);
-}
-
-float limitarCotovelo(float ang) {
-  return constrain(ang, -90, 90);
-}
-
-long grausParaPassos(float grau) {
-  return round(grau * passoPorGrau);
-}
