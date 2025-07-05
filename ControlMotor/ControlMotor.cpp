@@ -45,7 +45,7 @@ void inicializarMotores() {
 
 // Funções auxiliares
 float limitarBase(float ang) {
-  return constrain(ang, -180, 180);
+  return constrain(ang, -90, 90);
 }
 
 float limitarOmbro(float ang) {
@@ -53,7 +53,7 @@ float limitarOmbro(float ang) {
 }
 
 float limitarCotovelo(float ang) {
-  return constrain(ang, -90, 90);
+  return constrain(ang, -150, 150);
 }
 
 long grausParaPassos(float grau) {
@@ -115,4 +115,3 @@ void desativarCalibracao() {
 bool emModoCalibracao() {
   return modoCalibracao;
 }
-

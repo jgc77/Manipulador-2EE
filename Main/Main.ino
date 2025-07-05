@@ -15,7 +15,6 @@ void loop() {
 
   // Exemplo de uso do seletor
   bool seletor = obterEstadoSeletor();
-  // if (seletor == false) { ... } // pode usar aqui futuramente
 
   if (Serial.available()) {
     char inChar = (char)Serial.read();
