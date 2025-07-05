@@ -37,13 +37,13 @@ void setup() {
   digitalWrite(enable2, LOW);
   digitalWrite(enable3, LOW);
 
-  stepper1.setMaxSpeed(100);
+  stepper1.setMaxSpeed(90);
   stepper1.setAcceleration(50);
 
-  stepper2.setMaxSpeed(100);
+  stepper2.setMaxSpeed(90);
   stepper2.setAcceleration(50);
 
-  stepper3.setMaxSpeed(100);
+  stepper3.setMaxSpeed(90);
   stepper3.setAcceleration(50);
 
   Serial.println("Digite os ângulos (graus) para base, ombro e cotovelo (ex: 90 -45 30):");
@@ -88,11 +88,11 @@ void processaComando(String input) {
     digitalWrite(enable1, HIGH);
     digitalWrite(enable2, HIGH);
     digitalWrite(enable3, HIGH);
-    Serial.println("Modo calibração ativado. Digite 'ok' para desativar.");
+    Serial.println("Modo calibração ativado. Digite 'exit' para desativar.");
     return;
   }
 
-  if (modoCalibracao && input.equalsIgnoreCase("ok")) {
+  if (modoCalibracao && input.equalsIgnoreCase("exit")) {
     modoCalibracao = false;
     digitalWrite(enable1, LOW);
     digitalWrite(enable2, LOW);
