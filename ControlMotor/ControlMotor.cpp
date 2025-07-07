@@ -1,27 +1,33 @@
 #include "ControlMotor.h"
 
+// Conversão de graus para passos
 const float passoPorGrau = 2048.0 / 360.0;
 
+// Portas dos motores
 AccelStepper stepper1(1, 4, 5);
 AccelStepper stepper2(1, 6, 7);
 AccelStepper stepper3(1, 8, 9);
 
+// Enable dos drives
 const int enable1 = 10;
 const int enable2 = 11;
 const int enable3 = 12;
 
+// Seletor de cinematica
 const int pinoSeletor = 2;
 int estadoSeletor = HIGH;
 int estadoAnteriorSeletor = HIGH;
 unsigned long ultimaMudanca = 0;
 const unsigned long tempoDebounce = 30; // ms
 
+// Posicao inicial
 long target1 = 0;
 long target2 = 0;
 long target3 = 0;
 
 bool modoCalibracao = false;
 
+// Parametros
 void inicializarMotores() {
   pinMode(enable1, OUTPUT);
   pinMode(enable2, OUTPUT);
@@ -43,7 +49,7 @@ void inicializarMotores() {
   pinMode(pinoSeletor, INPUT_PULLUP);
 }
 
-// Funções auxiliares
+// Funções de limitação de ângulo
 float limitarBase(float ang) {
   return constrain(ang, -90, 90);
 }
@@ -60,6 +66,7 @@ long grausParaPassos(float grau) {
   return round(grau * passoPorGrau);
 }
 
+// Aciona os motores
 void atualizarMotores() {
   stepper1.moveTo(target1);
   stepper2.moveTo(target2);
@@ -70,11 +77,12 @@ void atualizarMotores() {
   stepper3.run();
 }
 
+// Verifica o seletor de cinematica com millis
 void verificarSeletor() {
   int SeletorAtual = digitalRead(pinoSeletor);
 
   if (SeletorAtual != estadoAnteriorSeletor) {
-    ultimaMudanca = millis(); // resetar timer
+    ultimaMudanca = millis();
   }
 
   if ((millis() - ultimaMudanca) > tempoDebounce) {
@@ -92,12 +100,14 @@ bool obterEstadoSeletor() {
   return estadoSeletor;
 }
 
+// calculo de passos com limitações
 void setAlvosGraus(float base, float ombro, float cotovelo) {
   target1 = grausParaPassos(limitarBase(base));
   target2 = grausParaPassos(limitarOmbro(ombro));
   target3 = grausParaPassos(limitarCotovelo(cotovelo));
 }
 
+//função de calibrção
 void ativarCalibracao() {
   modoCalibracao = true;
   digitalWrite(enable1, HIGH);
