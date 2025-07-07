@@ -1,5 +1,5 @@
-#ifndef RRR_KINEMATICS_H
-#define RRR_KINEMATICS_H
+#ifndef CINEMATIC_H
+#define CINEMATIC_H
 
 #include <cmath>
 /* --------- Estruturas básicas --------- */
