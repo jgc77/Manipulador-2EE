@@ -53,12 +53,5 @@ bool cin_inv(const Dim& d, const Pos& p, Ang& solUp, bool checkLimits)
 
     if (!checkLimits)  return true;
 
-    /* Limites de junta (graus) */
-    const bool ok =
-        solUp.t1 >= -150.f && solUp.t1 <= 150.f &&
-        solUp.t2 >=  -90.f && solUp.t2 <=  90.f &&
-        solUp.t3 >=  -90.f && solUp.t3 <=  90.f;
-
-    return ok;
 }
 
