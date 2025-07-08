@@ -1,25 +1,47 @@
 #include "ControlMotor.h"
-#include "Cinematic.h"  // Cinemática direta/inversa
+#include "Cinematic.h"
 
 String inputString = "";
 bool newData = false;
 
-// Define dimensões fixas do robô (em cm, por exemplo)
-const Dim dim = {6.8, 6.5, 7.3};
+const Dim dim = {6.8, 6.5, 5.0}; // Dimensões do manipulador
+
+bool modoAtual = -1; // -1 = indefinido, 0 = direta, 1 = inversa
 
 void setup() {
   Serial.begin(9600);
-  inicializarMotores(); // Inicializa os motores
+  inicializarMotores();
 
-  Serial.println("Digite:");
-  Serial.println("Modo direto:    90 -45 30");
-  Serial.println("Modo inverso:   10 5 8");
+  Serial.println("=========================================");
+  Serial.println(" Manipulador Robótico RRR Antropomórfico");
+  Serial.println("=========================================");
+  Serial.println("Selecione na chave seletora:");
+  Serial.println(" [0] Cinemática Direta");
+  Serial.println(" [1] Cinemática Inversa");
+  Serial.println("Ou digite 'calib' para entrar no modo calibração");
+  Serial.println();
 }
 
 void loop() {
-  verificarSeletor(); // Lê seletor físico
-  bool seletor = obterEstadoSeletor(); // true = modo direto, false = modo inverso
+  verificarSeletor();
+  bool seletor = obterEstadoSeletor(); // true = direta (1), false = inversa (0)
 
+  // Atualiza e imprime o modo selecionado se houver mudança
+  if (seletor != modoAtual) {
+    modoAtual = seletor;
+    Serial.println();
+    if (modoAtual == 0) {
+      Serial.println(">> Modo selecionado: Cinemática Direta");
+      Serial.println("Digite os ângulos da base, ombro e cotovelo (ex: 90 -45 30)");
+      Serial.println("O sistema irá calcular e exibir a posição final do atuador.");
+    } else {
+      Serial.println(">> Modo selecionado: Cinemática Inversa");
+      Serial.println("Digite a posição desejada do atuador no formato X Y Z (ex: 10 5 8)");
+    }
+    Serial.println();
+  }
+
+  // Leitura da serial
   if (Serial.available()) {
     char inChar = (char)Serial.read();
     if (inChar == '\n') {
@@ -30,12 +52,12 @@ void loop() {
   }
 
   if (newData) {
-    processaComando(inputString, seletor);
+    processaComando(inputString, modoAtual);
     inputString = "";
     newData = false;
   }
 
-  atualizarMotores(); // Move motores de forma gradual
+  atualizarMotores();
 }
 
 void processaComando(String input, bool seletorDireto) {
@@ -43,13 +65,13 @@ void processaComando(String input, bool seletorDireto) {
 
   if (input.equalsIgnoreCase("calib")) {
     ativarCalibracao();
-    Serial.println("Modo calibração ativado. Digite 'exit' para desativar.");
+    Serial.println(">> Modo calibração ativado. Digite 'exit' para desativar.");
     return;
   }
 
   if (emModoCalibracao() && input.equalsIgnoreCase("exit")) {
     desativarCalibracao();
-    Serial.println("Modo calibração desativado.");
+    Serial.println(">> Modo calibração desativado.");
     return;
   }
 
@@ -65,45 +87,52 @@ void parseInput(String input, bool seletorDireto) {
     float v2 = input.substring(space1 + 1, space2).toFloat();
     float v3 = input.substring(space2 + 1).toFloat();
 
-    if (seletorDireto) {
-      // Modo Direto: usuário passou ângulos
+    if (seletorDireto == 0) {
+      // Cinemática Direta: entrada = ângulos
       setAlvosGraus(v1, v2, v3);
 
-      Serial.print("Movendo para: Base = ");
-      Serial.print(v1);
-      Serial.print("° | Ombro = ");
-      Serial.print(v2);
-      Serial.print("° | Cotovelo = ");
-      Serial.print(v3);
-      Serial.println("°");
+      Serial.println();
+      Serial.print(">> Movendo para: Base = ");
+      Serial.print(v1); Serial.print("°, Ombro = ");
+      Serial.print(v2); Serial.print("°, Cotovelo = ");
+      Serial.print(v3); Serial.println("°");
+
+      // Calcula posição resultante do atuador
+      Ang ang = {v1, v2, v3};
+      Pos pos = cin_dir(dim, ang);
+
+      Serial.print(">> Posição estimada do atuador (X Y Z): ");
+      Serial.print(pos.x, 2); Serial.print(" ");
+      Serial.print(pos.y, 2); Serial.print(" ");
+      Serial.print(pos.z, 2); Serial.println();
+      Serial.println();
 
     } else {
-      // Modo Inverso: usuário passou posição (x, y, z)
+      // Cinemática Inversa: entrada = posição (x y z)
       Pos alvo = {v1, v2, v3};
       Ang ang = cin_inv(dim, alvo);
 
       if (isnan(ang.t1) || isnan(ang.t2) || isnan(ang.t3)) {
-        Serial.println("Posição fora do alcance do braço.");
+        Serial.println(">> ERRO: Posição fora do alcance do braço.");
         return;
       }
 
       setAlvosGraus(ang.t1, ang.t2, ang.t3);
 
-      Serial.print("Alvo XYZ = ");
-      Serial.print(v1); Serial.print(", ");
-      Serial.print(v2); Serial.print(", ");
-      Serial.println(v3);
+      Serial.println();
+      Serial.print(">> Posição desejada (X Y Z): ");
+      Serial.print(v1); Serial.print(" ");
+      Serial.print(v2); Serial.print(" ");
+      Serial.print(v3); Serial.println();
 
-      Serial.print("Movendo para: Base = ");
-      Serial.print(ang.t1);
-      Serial.print("° | Ombro = ");
-      Serial.print(ang.t2);
-      Serial.print("° | Cotovelo = ");
-      Serial.print(ang.t3);
-      Serial.println("°");
+      Serial.print(">> Movendo para ângulos: Base = ");
+      Serial.print(ang.t1); Serial.print("°, Ombro = ");
+      Serial.print(ang.t2); Serial.print("°, Cotovelo = ");
+      Serial.print(ang.t3); Serial.println("°");
+      Serial.println();
     }
 
   } else {
-    Serial.println("Formato inválido. Use: v1 v2 v3 (ex: 90 -45 30 ou 10 5 8)");
+    Serial.println(">> Formato inválido. Use três valores separados por espaço.");
   }
 }
