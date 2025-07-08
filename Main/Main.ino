@@ -5,7 +5,7 @@ String inputString = "";
 bool newData = false;
 
 // Define dimensões fixas do robô (em cm, por exemplo)
-const Dim dim = {6.8, 6.5, 5.0};
+const Dim dim = {6.8, 6.5, 7.3};
 
 void setup() {
   Serial.begin(9600);
