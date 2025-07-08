@@ -1,18 +1,20 @@
 /************************************************************
- *  RRR Kinematics – implementation (cotovelo sempre ↑)
+ *  RRR Kinematics – implementation (cotovelo sempre para cima)
  ************************************************************/
 #include "cinematic.h"
 
+
+
 /* --------- Auxiliares internos --------- */
-static inline float sq   (float v)             { return v * v; }
-static inline float clamp(float v)             { return v < -1.f ? -1.f : (v > 1.f ? 1.f : v); }
+static inline float sq   (float v) { return v * v; }
+static inline float clamp(float v) { return v < -1.f ? -1.f : (v > 1.f ? 1.f : v); }
 
 /* --------- Cinemática Direta --------- */
 Pos cin_dir(const Dim& d, const Ang& a)
 {
-    const float t1 =  a.t1 * D2R;           // anti‑horário
-    const float t2 = (a.t2 + 90.f) * D2R;   // 0° = braço vertical
-    const float t3 =  a.t3 * D2R;           // 0° = esticado
+    const float t1 =  a.t1 * D2R;
+    const float t2 = (a.t2 + 90.f) * D2R;
+    const float t3 =  a.t3 * D2R;
 
     const float c1 = std::cos(t1),  s1 = std::sin(t1);
     const float c2 = std::cos(t2),  s2 = std::sin(t2);
@@ -23,7 +25,7 @@ Pos cin_dir(const Dim& d, const Ang& a)
               d.L1 + d.L2*s2 + d.L3*s23 };
 }
 
-/* --------- Cinemática Inversa  (cotovelo ↑ fixo) --------- */
+/* --------- Cinemática Inversa (cotovelo ↑ fixo) --------- */
 bool cin_inv(const Dim& d, const Pos& p, Ang& solUp, bool checkLimits)
 {
     const float r  = std::hypot(p.x, p.y);
@@ -34,24 +36,30 @@ bool cin_inv(const Dim& d, const Pos& p, Ang& solUp, bool checkLimits)
     if (d2 > sq(d.L2+d.L3) || d2 < sq(std::fabs(d.L2-d.L3)))
         return false;
 
-    /* θ1 (anti‑horário) */
+    /* θ1 */
     const float t1_deg = std::atan2(p.y, p.x) * R2D;
 
     /* θ3 (cotovelo para cima) */
     const float cphi   = clamp((sq(d.L2)+sq(d.L3)-d2) / (2*d.L2*d.L3));
-    const float phi    = std::acos(cphi);                /* 0…π */
-    const float t3_rad =  M_PI - phi;                    /* rad */
-    const float t3_deg =  t3_rad * R2D;                  /* deg */
+    const float phi    = std::acos(cphi);
+    const float t3_rad =  M_PI - phi;
+    const float t3_deg =  t3_rad * R2D;
 
-    /* θ2 físico */
+    /* θ2 */
     const float k1 = d.L2 + d.L3*std::cos(t3_rad);
     const float k2 = d.L3*std::sin(t3_rad);
     const float t2_phys = std::atan2(zp, r) - std::atan2(k2, k1);
-    const float t2_deg  =  t2_phys * R2D - 90.f;         /* relativo */
+    const float t2_deg  =  t2_phys * R2D - 90.f;
 
     solUp = { t1_deg, t2_deg, t3_deg };
 
-    if (!checkLimits)  return true;
+   
 
+    /* --- Limites agora ±360 ° --- */
+//    const bool ok =
+  //      solUp.t1 >= -360.f && solUp.t1 <= 360.f &&
+    //    solUp.t2 >= -360.f && solUp.t2 <= 360.f &&
+      //  solUp.t3 >= -360.f && solUp.t3 <= 360.f;
+
+    return ok;  // sempre true dentro de ±360°
 }
-
