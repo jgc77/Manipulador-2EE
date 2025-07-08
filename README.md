@@ -73,3 +73,8 @@ Digite a posição desejada do atuador no formato X Y Z (ex: 10 5 8)
 1. Copie as pastas **ControlMotor** e **Cinematic** para a pasta `libraries` do Arduino.
 2. Abra o sketch principal em **/Main** e carregue para a placa Arduino.
 3. Edite o código conforme necessário, ajustando os parâmetros do motor (passos por volta, velocidade, aceleração) de acordo com o seu hardware.
+
+## 📜 Licença
+
+Este projeto está licenciado sob a [Creative Commons BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/).  
+Você pode usá-lo e modificá-lo para fins **não comerciais**, desde que **mantenha os créditos** ao autor e compartilhe qualquer modificação sob a **mesma licença**.
