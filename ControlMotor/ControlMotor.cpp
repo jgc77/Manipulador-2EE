@@ -51,15 +51,15 @@ void inicializarMotores() {
 
 // Funções de limitação de ângulo
 float limitarBase(float ang) {
-  return constrain(ang, -90, 90);
+  return constrain(ang, -360, 360);
 }
 
 float limitarOmbro(float ang) {
-  return constrain(ang, -90, 90);
+  return constrain(ang, -360, 360);
 }
 
 float limitarCotovelo(float ang) {
-  return constrain(ang, -150, 150);
+  return constrain(ang, -360, 360);
 }
 
 long grausParaPassos(float grau) {
@@ -88,7 +88,7 @@ void verificarSeletor() {
   if ((millis() - ultimaMudanca) > tempoDebounce) {
     if (SeletorAtual != estadoSeletor) {
       estadoSeletor = SeletorAtual;
-      Serial.println(estadoSeletor == HIGH ? "Seletor 0" : "Seletor 1");
+      //Serial.println(estadoSeletor == HIGH ? "Seletor 0" : "Seletor 1");
     }
   }
 
