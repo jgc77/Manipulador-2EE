@@ -20,8 +20,6 @@ Pos  cin_dir(const Dim& d, const Ang& a);
 
 /*  cin_inv (cotovelo ↑ fixo)
  */
-bool cin_inv(const Dim& d, const Pos& p,
-             Ang& solUp,
-             bool checkLimits = true);
+Ang cin_inv(const Dim& d, const Pos& p);
 
 #endif  /* RRR_KINEMATICS_H */
