@@ -26,40 +26,34 @@ Pos cin_dir(const Dim& d, const Ang& a)
 }
 
 /* --------- Cinemática Inversa (cotovelo ↑ fixo) --------- */
-bool cin_inv(const Dim& d, const Pos& p, Ang& solUp, bool checkLimits)
+Ang cin_inv(const Dim& d, const Pos& p)
 {
-    const float r  = std::hypot(p.x, p.y);
-    const float zp = p.z - d.L1;
-    const float d2 = sq(r) + sq(zp);
+ //   const float NaN = std::numeric_limits<float>::quiet_NaN();
+  //  Ang   res{NaN, NaN, NaN};
 
-    /* Alcance geométrico */
+    float r  = std::hypot(p.x, p.y);
+    float zp = p.z - d.L1;
+    float d2 = sq(r) + sq(zp);
+
+    /* Fora do alcance geométrico? */
     if (d2 > sq(d.L2+d.L3) || d2 < sq(std::fabs(d.L2-d.L3)))
-        return false;
+        return res;
 
     /* θ1 */
-    const float t1_deg = std::atan2(p.y, p.x) * R2D;
+    float t1_deg = std::atan2(p.y, p.x) * R2D;
 
     /* θ3 (cotovelo para cima) */
-    const float cphi   = clamp((sq(d.L2)+sq(d.L3)-d2) / (2*d.L2*d.L3));
-    const float phi    = std::acos(cphi);
-    const float t3_rad =  M_PI - phi;
-    const float t3_deg =  t3_rad * R2D;
+    float cphi   = clamp((sq(d.L2)+sq(d.L3)-d2) / (2*d.L2*d.L3));
+    float phi    = std::acos(cphi);            // 0…π
+    float t3_rad =  M_PI - phi;
+    float t3_deg =  t3_rad * R2D;
 
     /* θ2 */
-    const float k1 = d.L2 + d.L3*std::cos(t3_rad);
-    const float k2 = d.L3*std::sin(t3_rad);
-    const float t2_phys = std::atan2(zp, r) - std::atan2(k2, k1);
-    const float t2_deg  =  t2_phys * R2D - 90.f;
+    float k1 = d.L2 + d.L3*std::cos(t3_rad);
+    float k2 = d.L3*std::sin(t3_rad);
+    float t2_phys = std::atan2(zp, r) - std::atan2(k2, k1);
+    float t2_deg  = t2_phys * R2D - 90.f;
 
-    solUp = { t1_deg, t2_deg, t3_deg };
-
-   
-
-    /* --- Limites agora ±360 ° --- */
-//    const bool ok =
-  //      solUp.t1 >= -360.f && solUp.t1 <= 360.f &&
-    //    solUp.t2 >= -360.f && solUp.t2 <= 360.f &&
-      //  solUp.t3 >= -360.f && solUp.t3 <= 360.f;
-
-    return ok;  // sempre true dentro de ±360°
+    res = { t1_deg, t2_deg, t3_deg };
+    return res;                     // sem limite: aceita ±360 °
 }
