@@ -2,9 +2,7 @@
 #define CINEMATIC_H
 
 /*****************************************************************
-
- *  RRR Kinematics – header
-
+ *  RRR Kinematics – header (versão compatível com Arduino)
  *****************************************************************/
 #include <math.h>  // substitui <cmath> para o Arduino
 
