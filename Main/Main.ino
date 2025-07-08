@@ -16,8 +16,8 @@ void setup() {
   Serial.println(" Manipulador Robótico RRR Antropomórfico");
   Serial.println("=========================================");
   Serial.println("Selecione na chave seletora:");
-  Serial.println(" [0] Cinemática Direta");
   Serial.println(" [1] Cinemática Inversa");
+  Serial.println(" [2] Cinemática Direta");
   Serial.println("Ou digite 'calib' para entrar no modo calibração");
   Serial.println();
 }
