@@ -31,12 +31,12 @@ Ang cin_inv(const Dim& d, const Pos& p)
 {
     float r  = sqrt(p.x * p.x + p.y * p.y);  // substitui hypot
     float zp = p.z - d.L1;
-    float d2 = sqrt(r*r + zp*zp);
+    float d2 = sq(r) + sq(zp);
 
     if (d2 > sq(d.L2 + d.L3) || d2 < sq(fabs(d.L2 - d.L3)))
         return { NAN, NAN, NAN }; // fora do alcance
 
-    float t1_deg = atan2(p.x, p.y) * R2D;
+   float t1_deg = atan2(p.y, p.x) * R2D;
 
     float cphi   = clamp((sq(d.L2) + sq(d.L3) - d2) / (2 * d.L2 * d.L3));
     float phi    = acos(cphi);
