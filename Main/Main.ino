@@ -4,7 +4,7 @@
 String inputString = "";
 bool newData = false;
 
-const Dim dim = {6.0, 6.0, 7.0}; // Dimensões do manipulador
+const Dim dim = {5.7, 6.0, 7.3}; // Dimensões do manipulador
 
 bool modoAtual = -1; // -1 = indefinido, 0 = direta, 1 = inversa
 
@@ -92,6 +92,7 @@ void parseInput(String input, bool seletorDireto) {
       setAlvosGraus(v1, v2, v3);
 
       Serial.println();
+      Serial.print(">> Cinemática Direta <<"); Serial.println();
       Serial.print(">> Movendo para: Base = ");
       Serial.print(v1); Serial.print("°, Ombro = ");
       Serial.print(v2); Serial.print("°, Cotovelo = ");
@@ -100,7 +101,7 @@ void parseInput(String input, bool seletorDireto) {
       // Calcula posição resultante do atuador
       Ang ang = {v1, v2, v3};
       Pos pos = cin_dir(dim, ang);
-
+      
       Serial.print(">> Posição estimada do atuador (X Y Z): ");
       Serial.print(pos.x, 2); Serial.print(" ");
       Serial.print(pos.y, 2); Serial.print(" ");
@@ -120,6 +121,7 @@ void parseInput(String input, bool seletorDireto) {
       setAlvosGraus(ang.t1, ang.t2, ang.t3);
 
       Serial.println();
+      Serial.print(">> Cinemática Inversa <<"); Serial.println();
       Serial.print(">> Posição desejada (X Y Z): ");
       Serial.print(v1); Serial.print(" ");
       Serial.print(v2); Serial.print(" ");
