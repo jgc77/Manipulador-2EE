@@ -35,9 +35,13 @@ Ang cin_inv(const Dim& d, const Pos& p)
 
     if (d2 > sq(d.L2 + d.L3) || d2 < sq(fabs(d.L2 - d.L3)))
         return { NAN, NAN, NAN }; // fora do alcance
-
-   float t1_deg = atan2(p.y, p.x) * R2D;
-
+    float t1_deg;
+    float t1_deg_t = atan2(p.y, p.x) * R2D;
+    if (t1_deg_t < 0)
+        t1_deg = t1_deg_t + 180;
+    else
+        t1_deg = t1_deg_t; 
+    
     float cphi   = clamp((sq(d.L2) + sq(d.L3) - d2) / (2 * d.L2 * d.L3));
     float phi    = acos(cphi);
     float t3_rad = M_PI - phi;
@@ -45,8 +49,9 @@ Ang cin_inv(const Dim& d, const Pos& p)
 
     float k1 = d.L2 + d.L3 * cos(t3_rad);
     float k2 = d.L3 * sin(t3_rad);
-    float t2_phys = atan2(zp, r) - atan2(k2, k1);
-    float t2_deg  = t2_phys * R2D - 90.f;
+    float t2_phys = atan2(zp, r) + atan2(k2, k1);
+    float t2_teste  =  t2_phys * R2D - 90.f ;                    // relativo
+    float t2_deg = - t2_teste;
 
     return { t1_deg, t2_deg, t3_deg };
 }
