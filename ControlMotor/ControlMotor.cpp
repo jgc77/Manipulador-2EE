@@ -38,7 +38,7 @@ void inicializarMotores() {
   digitalWrite(enable3, LOW);
 
   stepper1.setMaxSpeed(90);
-  stepper1.setAcceleration(50);
+  stepper1.setAcceleration(60);
 
   stepper2.setMaxSpeed(90);
   stepper2.setAcceleration(50);
@@ -51,15 +51,15 @@ void inicializarMotores() {
 
 // Funções de limitação de ângulo
 float limitarBase(float ang) {
-  return constrain(ang, -360, 360);
+  return constrain(ang, -150, 150);
 }
 
 float limitarOmbro(float ang) {
-  return constrain(ang, -360, 360);
+  return constrain(ang, -80, 80);
 }
 
 float limitarCotovelo(float ang) {
-  return constrain(ang, -360, 360);
+  return constrain(ang, -100, 100);
 }
 
 long grausParaPassos(float grau) {
