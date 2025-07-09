@@ -51,15 +51,15 @@ void inicializarMotores() {
 
 // Funções de limitação de ângulo
 float limitarBase(float ang) {
-  return constrain(ang, -150, 150);
+  return constrain(ang, -180, 180);
 }
 
 float limitarOmbro(float ang) {
-  return constrain(ang, -80, 80);
+  return constrain(ang, -115, 115);
 }
 
 float limitarCotovelo(float ang) {
-  return constrain(ang, -100, 100);
+  return constrain(ang, -142, 142);
 }
 
 long grausParaPassos(float grau) {

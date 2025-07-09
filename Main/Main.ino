@@ -4,7 +4,7 @@
 String inputString = "";
 bool newData = false;
 
-const Dim dim = {5.7, 6.0, 7.3}; // Dimensões do manipulador
+const Dim dim = {6.3, 5.4, 7.3}; // Dimensões do manipulador
 
 bool modoAtual = -1; // -1 = indefinido, 0 = direta, 1 = inversa
 
