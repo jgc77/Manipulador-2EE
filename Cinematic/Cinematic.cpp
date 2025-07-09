@@ -50,8 +50,14 @@ Ang cin_inv(const Dim& d, const Pos& p)
     float k1 = d.L2 + d.L3 * cos(t3_rad);
     float k2 = d.L3 * sin(t3_rad);
     float t2_phys = atan2(zp, r) + atan2(k2, k1);
-    float t2_teste  =  t2_phys * R2D - 90.f ;                    // relativo
-    float t2_deg = - t2_teste;
+    float t2_teste  =  t2_phys * R2D - 90.f ;
+    float t2_teste_2 = 180 - t2_teste;
+    float t2_deg;
+    if (t2_teste < t2_teste_2)
+        t2_deg = - t2_teste;
+        
+    else
+        t2_deg = - t2_teste_2;
 
     return { t1_deg, t2_deg, t3_deg };
 }
