@@ -22,7 +22,10 @@ Este trabalho foi desenvolvido como parte do **Projeto 2EE de Robótica** do cur
 - **Chave seletora** (leitura digital para definir o modo de operação)
 - **Jumpers, protoboard ou shield**
 - **Biblioteca AccelStepper** instalada na IDE do Arduino
-> **[https://github.com/jgc77/Manipulador-2EE/blob/main/Docs/Diagrama%20El%C3%A9trico.pdf]**
+  
+## 🔩 Modo de Montagem
+- **Topologia:** [https://github.com/jgc77/Manipulador-2EE/blob/main/Docs/Estrutura%20do%20manipulador.jpg]
+- **Diagrama Elétrico:** [https://github.com/jgc77/Manipulador-2EE/blob/main/Docs/Diagrama%20El%C3%A9trico.pdf]
 
 ## ⚙️ Modos de Operação
 
